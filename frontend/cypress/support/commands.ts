@@ -39,6 +39,7 @@
 declare namespace Cypress {
     interface Chainable<Subject = any> {
         login(): Chainable<string>;
+        cleanCart(): Chainable<string>;
     }
 }
 
@@ -52,6 +53,14 @@ Cypress.Commands.add('login', () => {
     },
   }).then((response) => {
     expect(response.status).to.eq(200);
+    window.localStorage.setItem('token', response.body.token);
     return response.body.token;
   });
 });
+
+Cypress.Commands.add('cleanCart', () => {
+  cy.visit('http://localhost:4200/#/cart');
+  cy.get('[data-cy="cart-line-delete"]').each(($btn) => {
+    cy.wrap($btn).click();
+  })
+})
