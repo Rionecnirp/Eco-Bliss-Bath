@@ -8,21 +8,19 @@
 describe("Test fonctionnel - Connexion utilisateur", () => {
   it("devrait permettre de se connecter avec des identifiants valides", () => {
 
-    cy.visit("http://localhost:4200");
+    cy.visit("http://localhost:4200")
 
-    cy.get('[data-cy="nav-link-login"]').click();
-    cy.url().should("include", "/login");
+    cy.get("[data-cy='nav-link-login']").click()
+    cy.url().should("include", "/login")
 
-    cy.get('[data-cy="login-form"]').should("be.visible");
-    cy.get('[data-cy="login-input-username"]').type("test2@test.fr");
-    cy.get('[data-cy="login-input-password"]').type("testtest");
-    cy.get('[data-cy="login-submit"]').click();
+    cy.get("[data-cy='login-form']").should("be.visible")
+    cy.get("[data-cy='login-input-username']").type("test2@test.fr")
+    cy.get("[data-cy='login-input-password']").type("testtest")
+    cy.get("[data-cy='login-submit']").click()
     
-    cy.url().should("not.include", "/login");
-    cy.get('[data-cy="nav-link-logout"]').should("be.visible");
-    cy.get('[data-cy="nav-link-login"]').should("not.exist");
-    cy.get('[data-cy="nav-link-cart"]').should("be.visible");
-
-    
-  });
-});
+    cy.url().should("not.include", "/login")
+    cy.get("[data-cy='nav-link-logout']").should("be.visible")
+    cy.get("[data-cy='nav-link-login']").should("not.exist")
+    cy.get("[data-cy='nav-link-cart']").should("be.visible")
+  })
+})

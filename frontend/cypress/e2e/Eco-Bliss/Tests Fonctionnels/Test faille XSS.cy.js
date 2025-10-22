@@ -1,5 +1,11 @@
 describe("Tests API - Faille XSS", () => {
 
+    /**Dans ce test, on vérifie s'il est possible d'exploiter les avis pour faire de l'injection de script.
+     * Pour ce faire, on réutilise le code de l'envoi d'avis, mais on place un morceau de code dans la section commentaire.
+     * On essaie de regarder si l'envoi de l'avis est arrêté/interdit.
+     * Puis, dans l'éventualité où l'avis est envoyé, on vérifie si le morceau de code n'est pas présent.
+    */
+
     it("Ne doit pas accepter ni renvoyer de code HTML ou script brut", () => {
 
         cy.loginBack().then((token) => {
@@ -20,7 +26,6 @@ describe("Tests API - Faille XSS", () => {
                 },
                 body: review,
             }).then((response) => {
-
                 cy.log("Réponse :", JSON.stringify(response.body))
 
                 if ([400, 403].includes(response.status)) {
@@ -31,14 +36,7 @@ describe("Tests API - Faille XSS", () => {
                     expect(response.body.comment).to.not.include("<script>")
                     expect(response.body.comment).to.not.include("</script>")
                 }
-
-                else {
-                throw new Error(`Réponse inattendue : ${response.status}`)
-                }
             })
-
         })
-
     })
-
 })

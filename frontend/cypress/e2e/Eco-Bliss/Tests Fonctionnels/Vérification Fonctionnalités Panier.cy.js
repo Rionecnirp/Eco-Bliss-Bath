@@ -1,130 +1,107 @@
-// Ce fichier contient des tests end-to-end Cypress pour vérifier le comportement du panier et la gestion du stock lors de l’ajout de produits.
 
-// Définition du bloc de tests principal pour l’ajout au panier et la vérification du stock.
 describe("Ajout au panier et vérification du stock", () => {
-  // Variable pour stocker le stock initial du produit testé.
-  let initialStock;
+  
+  /** Pour ce test, un commentaire sera placé avant chaque it pour spécifier ce dernier.
+   * Avant cela et pour chaque it, on se connecte sur le Frontend et on se place sur la page "produits". 
+  */
 
   beforeEach(() => {
-    cy.visit('http://localhost:4200/#/login');
-    cy.get('[data-cy="nav-link-login"]').click();
-    cy.get('[data-cy="login-input-username"]').type("test2@test.fr");
-    cy.get('[data-cy="login-input-password"]').type("testtest");
-    cy.get('[data-cy="login-submit"]').click();
-    cy.get('[data-cy="nav-link-logout"]').should("exist");
-    cy.visit('http://localhost:4200/#/cart');
-
-cy.visit('http://localhost:4200/#/products');
-
+    cy.loginFront()
+    cy.visit("http://localhost:4200/#/products")
   })
 
-  // Test : ajout d’un produit et vérification de la diminution du stock.
-  it("devrait ajouter un produit et vérifier la diminution du stock", () => {
-    
-    
-    
-    // Sélection du produit "Poussière de lune" et accès à sa fiche.
-    cy.contains('[data-cy="product"]', "Poussière de lune").within(() => {
-      cy.get('[data-cy="product-link"]').click();
+  /** Ce "it" sert à vérifier que l'ajout de produit dans le panier diminue correctement le stock du produit.
+   * On initie une variable initialStock pour stocker la valeur du stock de produit.
+   * On clique spécifiquement sur le produit que l'on veut tester (ici "Poussière de lune").
+   * Puis, on regarde le stock actuel du produit :
+   * - En créant 2 variables qui servent à stocker le texte que l'on trouve dans "detail-product-stock" (rawText) et extraire juste le chiffre (match)
+   * - On s'assure que l'on ne ressort pas une valeur null
+   * - On transforme et stocke le résultat de match dans initialStock en nombres.
+   * - Et on place une dernière mesure de sûreté en plaçant vérifiant que initialstock soit bien un nombre au dessus de zéro.
+   * On clique sur le bouton d'ajout de produit et on s'assure d'être renvoyé au panier.
+   * Ensuite on vérifie que le panier contient bien le produit ajouté.
+   * Enfin on retourne sur la page du produit pour comparer le nouveau stock avec l'ancien stock.
+   * Dernière étape : on vide le panier pour les prochains tests.
+   */
+
+  it("Ajoute un produit et vérifie la diminution du stock", () => {
+    let initialStock
+
+    cy.contains("[data-cy='product']", "Poussière de lune").within(() => {
+      cy.get("[data-cy='product-link']").click()
     })      
-
-    // Extraction du stock initial affiché sur la fiche produit.
-    cy.get('[data-cy="detail-product-stock"]').should(
+    cy.get("[data-cy='detail-product-stock']").should(
       ($el) => {
-        const rawText = $el.text();
-        const match = rawText.match(/\d+/);
+        const rawText = $el.text()
+        const match = rawText.match(/\d+/)
         expect(match, "Aucun chiffre trouvé dans le texte de stock").to.not.be
-          .null;
-
-        initialStock = parseInt(match[0], 10);
-        expect(initialStock).to.be.a("number").and.to.be.greaterThan(0);
+          .null
+        initialStock = parseInt(match[0], 10)
+        expect(initialStock).to.be.a("number").and.to.be.greaterThan(0)
       }
-    );
+    )
+    cy.get("[data-cy='detail-product-add']").click()    
+    cy.url().should("include", "#/cart")
+    cy.get("[data-cy='cart-line']").should("contain", "Poussière de lune")
 
-    // Ajout du produit au panier.
-    cy.get('[data-cy="detail-product-add"]').click();
-
-    // Vérification de la redirection vers le panier et de la présence du produit.
-    
-    cy.url().should("include", "#/cart");
-    cy.get("#cart-content").should("exist");
-    cy.get('[data-cy="cart-line"]').should("contain", "Poussière de lune");
-
-    // Retour sur la fiche produit pour vérifier le stock mis à jour.
-    cy.go("back"); // Retour à la fiche produit.
-    cy.contains('[data-cy="detail-product-name"]', "Poussière de lune").should(
+    cy.go("back")
+    cy.contains("[data-cy='detail-product-name']", "Poussière de lune").should(
       "be.visible"
-    );
-    // Vérifie que le stock a diminué de 1 après l’ajout au panier.
-    cy.get('[data-cy="detail-product-stock"]')
+    )
+    cy.get("[data-cy='detail-product-stock']")
       .invoke("text")
       .then((updatedText) => {
-        const match = updatedText.match(/\d+/);
-        expect(match, "Aucun chiffre trouvé après ajout").to.not.be.null;
-        const updatedStock = parseInt(match[0], 10);
-        expect(updatedStock).to.eq(initialStock - 1);
-      });
-    cy.cleanCart();
-  });
+        const match = updatedText.match(/\d+/)
+        expect(match, "Aucun chiffre trouvé après ajout").to.not.be.null
+        const updatedStock = parseInt(match[0], 10)
+        expect(updatedStock).to.eq(initialStock - 1)
+      })
+    cy.cleanCart()
+  })
 
- 
+  /** Ce "it" vérifie que l'ajout de quantité négative est impossible.
+   * Pour cela, on vérifie avec la même fiche produit les mêmes informations.
+   * On change la quantité achetée à -1.
+   * Et on clique sur le bouton d'ajout de produit.
+   * Si tout fonctionne correctement, rien n'a été ajouté au panier et on n'a pas changé de page.
+   */
 
-  it("ne devrait pas permettre d’ajouter une quantité négative au panier", () => {
-  // Aller sur la fiche du même produit
-  cy.contains('[data-cy="product"]', "Poussière de lune").within(() => {
-  cy.get('[data-cy="product-link"]').click();
-  });
-  
-  // Vérifie que le champ quantité existe
-  cy.get('[data-cy="detail-product-quantity"]').should("exist");
+  it("Ne permet d’ajouter une quantité négative au panier", () => {
+    cy.contains("[data-cy='product']", "Poussière de lune").within(() => {
+      cy.get("[data-cy='product-link']").click()
+    })
+    cy.get("[data-cy='detail-product-quantity']").should("exist")
+    cy.get("[data-cy='detail-product-quantity']").clear().type("-1")
+    cy.get("[data-cy='detail-product-add']").click()
+    cy.location("hash").should("not.include", "/cart")
+    cy.get("[data-cy='detail-product-stock']").should("exist")
+  })
 
-  // Entrer une quantité négative
-  cy.get('[data-cy="detail-product-quantity"]').clear().type("-1");
-  
-  // Cliquer sur le bouton d’ajout
-  cy.get('[data-cy="detail-product-add"]').click();
+  /** Ce "it" vérifie si l'ajout de 20+ produits d'un seul coup est possible.
+   * Même approche que le premier test, sauf que l'on ajoute 21 produits.
+   * On vérifie ensuite si le changement d'URL a lieu, si c'est le cas, alors on vérifie le panier.
+   * On affiche la quantité de produits du panier dans le cy.log
+   * Enfin, on nettoie le panier pour les futurs tests.
+   */
 
-  cy.wait(2000);
-  
-  // Vérifie qu’on ne part pas vers la page panier
-  cy.location("hash").should("not.include", "/cart");
-  
-  // Vérifie qu’on reste bien sur la fiche produit
-  cy.get('[data-cy="detail-product-stock"]').should("exist");
-  
+  it("Vérifie s'il est possible d'ajouter plus de 20 produits", () => {
+    cy.contains("[data-cy='product']", "Poussière de lune").within(() => {
+      cy.get("[data-cy='product-link']").click()
+    })
+    cy.get("[data-cy='detail-product-quantity']").clear().type("21")
+    cy.get("[data-cy='detail-product-add']").click()
 
-  });
-
-
-
-  it("vérifie s'il est possible d'ajouter plus de 20 produits", () => {
-  // Aller sur un produit (ex. “Poussière de lune”)
-  cy.contains('[data-cy="product"]', "Poussière de lune").within(() => {
-    cy.get('[data-cy="product-link"]').click();
-  });
-
-  cy.get('[data-cy="detail-product-quantity"]').clear().type("21");
-
-  // Cliquer sur le bouton "Ajouter au panier"
-  cy.get('[data-cy="detail-product-add"]').click();
-
-  cy.wait(2000);
-
-  // Vérifier qu’on n’est **pas redirigé vers le panier**
-  cy.location("hash").then((loc) => {
-  if (loc.includes("/cart")) {
-    cy.log("On est redirigé vers /cart, il est donc possible d'ajouter plus de 20 produits");
-    cy.get('[data-cy="cart-line-quantity"]').should("exist").invoke('val').then((val) => {
-  const quantity = parseInt(val, 10);
-  cy.log(`Quantité dans le panier : ${quantity}`);
-});
-
-  } else {
-    cy.log("Pas redirigé vers /cart");
-  }
-});
-cy.cleanCart();
-});
-
-
-});
+    cy.location("hash").then((loc) => {
+      if (loc.includes("/cart")) {
+        cy.log("On est redirigé vers /cart, il est donc possible d'ajouter plus de 20 produits")
+        cy.get("[data-cy='cart-line-quantity']").should("exist").invoke("val").then((val) => {
+          const quantity = parseInt(val, 10)
+          cy.log(`Quantité dans le panier : ${quantity}`)
+        })
+      } else {
+        cy.log("Pas redirigé vers /cart")
+      }
+    })
+    cy.cleanCart()
+  })
+})
