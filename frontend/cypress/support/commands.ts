@@ -11,19 +11,19 @@
 //
 //
 // -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
+// Cypress.Commands.add("login", (email, password) => { ... })
 //
 //
 // -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
+// Cypress.Commands.add("drag", { prevSubject: "element"}, (subject, options) => { ... })
 //
 //
 // -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
+// Cypress.Commands.add("dismiss", { prevSubject: "optional"}, (subject, options) => { ... })
 //
 //
 // -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+// Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 //
 // declare global {
 //   namespace Cypress {
@@ -38,29 +38,44 @@
 
 declare namespace Cypress {
     interface Chainable<Subject = any> {
-        login(): Chainable<string>;
+        loginBack(): Chainable<string>;
+        loginFront(): Chainable<string>;
         cleanCart(): Chainable<string>;
     }
 }
 
-Cypress.Commands.add('login', () => {
+Cypress.Commands.add("loginBack", () => {
+  
   return cy.request({
-    method: 'POST',
-    url: 'http://localhost:8081/login',
+    method: "POST",
+    url: "http://localhost:8081/login",
     body: {
-      username: 'test2@test.fr',
-      password: 'testtest',
+      username: "test2@test.fr",
+      password: "testtest",
     },
   }).then((response) => {
     expect(response.status).to.eq(200);
-    window.localStorage.setItem('token', response.body.token);
     return response.body.token;
   });
 });
 
-Cypress.Commands.add('cleanCart', () => {
-  cy.visit('http://localhost:4200/#/cart');
-  cy.get('[data-cy="cart-line-delete"]').each(($btn) => {
+Cypress.Commands.add("loginFront", () => {
+  cy.visit("http://localhost:4200/#/login");
+    cy.get("[data-cy='nav-link-login']").click();
+    cy.get("[data-cy='login-input-username']").type("test2@test.fr");
+    cy.get("[data-cy='login-input-password']").type("testtest");
+    cy.get("[data-cy='login-submit']").click();
+    cy.get("[data-cy='nav-link-logout']").should("exist");
+    cy.log("connecté")
+});
+
+Cypress.Commands.add("cleanCart", () => {
+  cy.visit("http://localhost:4200/#/cart");
+  cy.get("[data-cy='cart-line-delete']").each(($btn) => {
     cy.wrap($btn).click();
   })
 })
+
+/**
+ * 
+ */
