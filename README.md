@@ -12,29 +12,27 @@
 </p>
 
 # Prérequis
-Pour démarrer cet applicatif web vous devez avoir les outils suivants:
-- Docker
-- NodeJs
+Pour démarrer cet applicatif web et lancer les tests, vous devez avoir des outils suivants:
+- Le projet cloné/installé localement.
+- Docker pour pouvoir accéder au Backend.
+- Pour lancer le Backend, il suffit d'ouvrir une console de commande dans le dossier "Eco-Bliss-Bath" et exécuter la commande "docker-compose up".
+- NodeJs installé sur le pc
+- NPM installé pour pouvoir lancer les commandes.
 
-# Installation et démarrage
-Clonez le projet pour le récupérer
-``` 
-git clone https://github.com/OpenClassrooms-Student-Center/Eco-Bliss-Bath-V2.git
-cd Eco-Bliss-Bath-V2
-```
-Pour démarrer l'API avec ça base de données.
-```
-docker compose up -d
-```
 # Pour démarrer le frontend de l'applicatif
-Rendez-vous dans le dossier frontend
-```
-cd ./frontend
-```
-Installez les dépendances du projet
-```
-npm i
-ou
-npm install (si vous préférez)
-```
+- Il suffit d'ouvrir une console de commande dans le dossier Frontend (ou d'y accéder depuis le dossier racide Eco-Bliss-Bath via cd ./frontend )
+- Puis, d'utiliser la commande "ng serve".
+- Cela ouvrira le port http://localhost:4200/ pour explorer le site.
+- Ensuite, dans une seconde console de commande, toujours dans le dossier frontend, vous allez devoir lancer la commande "npx cypress open".
+- Cela ouvrira Cypress pour permettre le lancement des divers tests se trouvant dans le projet.
+- Les tests s'effectuent depuis le navigateur de votre choix.
 
+
+# Tests Effectués
+- Tous les tests se trouvent dans le dossier ./frontend/cypress/e2e/Eco-Bliss
+- Tous les tests ont été effectués au moins une fois sur Chrome et Firefox.
+- Les tests sont répartis en 3 catégories différentes :
+  - Les Smoke tests, servant à couvrir les fonctionnalités principales du site.
+  - Les tests API, servant à vérifier le bon fonctionnement des requêtes faites et envoyées au backend.
+    - Ces tests sont eux mêmes découpés entre les tests GET et les tests POST.
+  - Les tests fonctionnels qui servent à assurer de la fonctionnalité de l'application par rapport aux exigences demandées.
