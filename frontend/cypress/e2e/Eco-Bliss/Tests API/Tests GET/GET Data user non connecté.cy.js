@@ -15,9 +15,9 @@ describe("TEST API - GET /orders quand non connecté", () => {
         failOnStatusCode: false,
     })
     .then((response) => {
-        expect([401]).to.include(response.status);
+        expect([401]).to.include(response.status)
 
         cy.log("Réponse reçue :", JSON.stringify(response.body))
-    });
-  });
-});
+    })
+  })
+})

@@ -31,24 +31,24 @@ describe("Test API - GET Ajout d'un produit dans le panier, puis vérification q
                 },
             })
             .then((response) => {
-                expect(response.status).to.eq(200);
+                expect(response.status).to.eq(200)
                 
-                expect(response.body).to.have.property("orderLines");
-                expect(response.body.orderLines).to.be.an("array");
+                expect(response.body).to.have.property("orderLines")
+                expect(response.body.orderLines).to.be.an("array")
 
                 response.body.orderLines.forEach((orderLine) => {
-                    expect(orderLine).to.have.property("id");
-                    expect(orderLine).to.have.property("quantity");
-                    expect(orderLine).to.have.property("product");
+                    expect(orderLine).to.have.property("id")
+                    expect(orderLine).to.have.property("quantity")
+                    expect(orderLine).to.have.property("product")
 
-                    const product = orderLine.product;
-                    expect(product).to.have.property("id");
-                    expect(product).to.have.property("name");
-                    expect(product).to.have.property("description");
-                    expect(product).to.have.property("price");
-                    expect(product).to.have.property("picture");
+                    const product = orderLine.product
+                    expect(product).to.have.property("id")
+                    expect(product).to.have.property("name")
+                    expect(product).to.have.property("description")
+                    expect(product).to.have.property("price")
+                    expect(product).to.have.property("picture")
                 })
-                cy.log("Produits dans le panier :", JSON.stringify(response.body.orderLines));
+                cy.log("Produits dans le panier :", JSON.stringify(response.body.orderLines))
             })
         })
         cy.cleanCart()
