@@ -89,7 +89,9 @@ describe("Ajout au panier et vérification du stock", () => {
       cy.get("[data-cy='product-link']").click()
     })
     cy.get("[data-cy='detail-product-quantity']").clear().type("21")
+    
     cy.get("[data-cy='detail-product-add']").click()
+    cy.url().should("include", "#/cart")
 
     cy.location("hash").then((loc) => {
       if (loc.includes("/cart")) {
