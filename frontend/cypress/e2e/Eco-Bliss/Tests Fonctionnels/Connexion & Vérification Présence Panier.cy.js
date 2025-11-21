@@ -8,7 +8,7 @@
 describe("Test fonctionnel - Connexion utilisateur", () => {
   it("devrait permettre de se connecter avec des identifiants valides", () => {
 
-    cy.visit("http://localhost:4200")
+    cy.visit("/#/")
 
     cy.get("[data-cy='nav-link-login']").click()
     cy.url().should("include", "/login")

@@ -10,7 +10,7 @@ describe("Tests API - POST /orders/add", () => {
     cy.loginBack().then((token) => {
         cy.request({
             method: "POST",
-            url: "http://localhost:8081/orders/add",
+            url: `${Cypress.env("apiUrl")}/orders/add`,
             failOnStatusCode: false,
             headers: {
                 Authorization: `Bearer ${token}`,

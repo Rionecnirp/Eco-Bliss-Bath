@@ -8,7 +8,7 @@ describe("Tests API - POST /login", () => {
   it("Renvoie une erreur 401 pour un utilisateur inconnu", () => {
     cy.request({
       method: "POST",
-      url: "http://localhost:8081/login",
+      url: `${Cypress.env("apiUrl")}/login`,
       failOnStatusCode: false,
       body: {
         username: "inconnu@test.com",
@@ -23,7 +23,7 @@ describe("Tests API - POST /login", () => {
   it("Renvoie une réponse 200 et un token pour un utilisateur connu", () => {
     cy.request({
       method: "POST",
-      url: "http://localhost:8081/login",
+      url: `${Cypress.env("apiUrl")}/login`,
       body: {
         username: "test2@test.fr",
         password: "testtest",

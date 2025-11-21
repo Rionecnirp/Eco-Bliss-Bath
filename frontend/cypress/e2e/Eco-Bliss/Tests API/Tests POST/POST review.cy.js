@@ -16,7 +16,7 @@ describe("Tests API - POST /reviews", () => {
 
             cy.request({
                 method: "POST",
-                url: "http://localhost:8081/reviews",
+                url: `${Cypress.env("apiUrl")}/reviews`,
                 failOnStatusCode: false,
                 headers: {
                     Authorization: `Bearer ${token}`,

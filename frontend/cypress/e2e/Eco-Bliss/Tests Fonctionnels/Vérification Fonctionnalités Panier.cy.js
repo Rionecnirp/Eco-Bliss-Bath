@@ -9,6 +9,11 @@ describe("Ajout au panier et vérification du stock", () => {
     cy.loginFront()
     cy.visit("http://localhost:4200/#/products")
   })
+  afterEach(() => {
+    cy.cleanCart().then(() => {
+      cy.log("Panier nettoyé")
+    })
+  })
 
   /** Ce "it" sert à vérifier que l'ajout de produit dans le panier diminue correctement le stock du produit.
    * On initie une variable initialStock pour stocker la valeur du stock de produit.
@@ -56,7 +61,6 @@ describe("Ajout au panier et vérification du stock", () => {
         const updatedStock = parseInt(match[0], 10)
         expect(updatedStock).to.eq(initialStock - 1)
       })
-    cy.cleanCart()
   })
 
   /** Ce "it" vérifie que l'ajout de quantité négative est impossible.
@@ -104,6 +108,5 @@ describe("Ajout au panier et vérification du stock", () => {
         cy.log("Pas redirigé vers /cart")
       }
     })
-    cy.cleanCart()
   })
 })

@@ -7,25 +7,28 @@ describe("Test API - GET Ajout d'un produit dans le panier, puis vérification q
      * On s'assure que toutes les propriétés du produit sont présentes.
      */
 
+    afterEach(() => {
+        cy.cleanCart()
+    })
+
     it("Ajout d'un produit côté Frontend, puis vérification du panier côté Backend", () => {
         cy.loginFront()
-        cy.visit("http://localhost:4200/#/products")
+        cy.visit("/#/products")
         cy.contains("[data-cy='product']", "Chuchotements d'été").within(() => {
             cy.get("[data-cy='product-link']").click()
         })  
-        cy.get("[data-cy='detail-product-add']").click()
-        cy.get("[data-cy='detail-product-add']").click()
-        /**Ce n'est pas une erreur, c'est une solution de fortune.
-         * Parfois, le premier clic n'est pas perçu et cela fait échouer le test.
-         * Faire une requête PUT permettrait d'éviter tout cela et est probablement la solution.
-         */
-        cy.visit("http://localhost:4200/#/cart")
+        cy.get("[data-cy='detail-product-add']")
+        .should('be.visible')
+        .and('not.be.disabled')
+        .click()
+        
+        cy.url().should("include", "#/cart")
         cy.get("[data-cy='cart-line']")
 
         cy.loginBack().then((token) => {
             cy.request({
                 method:"GET",
-                url: "http://localhost:8081/orders",
+                url: `${Cypress.env("apiUrl")}/orders`,
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -51,6 +54,5 @@ describe("Test API - GET Ajout d'un produit dans le panier, puis vérification q
                 cy.log("Produits dans le panier :", JSON.stringify(response.body.orderLines))
             })
         })
-        cy.cleanCart()
     })
 })

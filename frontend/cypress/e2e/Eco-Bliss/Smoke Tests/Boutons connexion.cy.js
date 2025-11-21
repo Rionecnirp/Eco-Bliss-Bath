@@ -9,15 +9,17 @@ describe("Smoke test - Page de connexion", () => {
    */
 
   it("On vérifie la présence du bouton connexion et la présence de tous les champs dans son formulaire", () => {
-    cy.visit("http://localhost:4200/#/")
-    cy.get("[data-cy='nav-link-login']").should("be.visible").click()
+    cy.visit("/#/")
+    cy.get("[data-cy='nav-link-login']").should("be.visible")
+    .click()
     cy.get("[data-cy='login-input-username']").should("exist")
     cy.get("[data-cy='login-input-password']").should("exist")
     cy.get("[data-cy='login-submit']").should("be.visible")
+    .and("be.enabled")
   })
 
   it("On vérifie la présence du bouton d'inscription et la présence de tous les champs dans son formulaire", () => {
-    cy.visit("http://localhost:4200/#/")
+    cy.visit("/#/")
     cy.get("[data-cy='nav-link-register']").should("be.visible").click()
     cy.get("[data-cy='register-input-lastname']").should("exist")
     cy.get("[data-cy='register-input-firstname']").should("exist")
@@ -25,5 +27,6 @@ describe("Smoke test - Page de connexion", () => {
     cy.get("[data-cy='register-input-password']").should("exist")
     cy.get("[data-cy='register-input-password-confirm']").should("exist")
     cy.get("[data-cy='register-submit']").should("be.visible")
+    .and("be.enabled")
   })
 })

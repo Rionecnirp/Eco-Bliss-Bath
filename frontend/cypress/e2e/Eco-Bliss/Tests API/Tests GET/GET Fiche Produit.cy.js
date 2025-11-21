@@ -10,7 +10,7 @@ describe("Tests API - GET /products/{id}", () => {
 
         cy.request({
             method: "GET",
-            url: `http://localhost:8081/products/${productId}`,
+            url: `${Cypress.env("apiUrl")}/products/${productId}`,
         }).then((response) => {
 
             expect(response.status).to.eq(200)

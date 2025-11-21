@@ -7,11 +7,11 @@ describe("TEST API - GET /orders quand non connecté", () => {
    */
   
   it("Doit retourner 401 si l'utilisateur n'est pas connecté", () => {
-    cy.visit("http://localhost:4200/#/")
+    cy.visit("/#/")
     cy.get("[data-cy='nav-link-login']").should("be.visible")
     cy.request({
         method: "GET",
-        url: "http://localhost:8081/orders",
+        url: `${Cypress.env("apiUrl")}/orders`,
         failOnStatusCode: false,
     })
     .then((response) => {

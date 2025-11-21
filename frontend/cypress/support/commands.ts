@@ -45,10 +45,11 @@ declare namespace Cypress {
 }
 
 Cypress.Commands.add("loginBack", () => {
+  const apiUrl = Cypress.env("apiUrl")
   
   return cy.request({
     method: "POST",
-    url: "http://localhost:8081/login",
+    url: `${apiUrl}/login`,
     body: {
       username: "test2@test.fr",
       password: "testtest",
@@ -60,22 +61,26 @@ Cypress.Commands.add("loginBack", () => {
 });
 
 Cypress.Commands.add("loginFront", () => {
-  cy.visit("http://localhost:4200/#/login");
+  cy.visit("/#/login");
     cy.get("[data-cy='nav-link-login']").click();
     cy.get("[data-cy='login-input-username']").type("test2@test.fr");
     cy.get("[data-cy='login-input-password']").type("testtest");
     cy.get("[data-cy='login-submit']").click();
     cy.get("[data-cy='nav-link-logout']").should("exist");
-    cy.log("connecté")
+    cy.url().should("not.include", "/login")
+    cy.log("connecté (Frontend)")
 });
 
 Cypress.Commands.add("cleanCart", () => {
-  cy.visit("http://localhost:4200/#/cart");
-  cy.get("[data-cy='cart-line-delete']").each(($btn) => {
-    cy.wrap($btn).click();
+  cy.visit("/#/cart");
+  cy.get("body").then(($body) => {
+    if ($body.find("[data-cy='cart-line-delete']").length > 0) {
+      cy.get("[data-cy='cart-line-delete']").each(($btn) => {
+        cy.wrap($btn).click()
+      })
+      cy.get("[data-cy='cart-line']").should("not.exist")
+    } else {
+      cy.log("Panier déja vide")
+    }
   })
 })
-
-/**
- * 
- */

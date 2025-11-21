@@ -10,7 +10,7 @@ describe("Smoke Test - Boutons Ajouter au panier sur chaque produit", () => {
 
   it("On vérifie la présence du bouton 'Ajouter au panier' pour chaque produit présent", () => {
     cy.loginFront()
-    cy.visit("http://localhost:4200/#/products")
+    cy.visit("/#/products")
     
     cy.get("[data-cy='product-link']").each(($productLink, index) => {
       cy.log(`Test du produit n°${index + 1}`)
