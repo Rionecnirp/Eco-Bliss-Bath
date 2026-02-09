@@ -17,7 +17,27 @@ describe("Tests API - POST /orders/add", () => {
                 Authorization: `Bearer ${token}`,
                 },
                 body: {
-                productId: 0,
+                product: 3,
+                quantity: 1,
+                },
+            })
+            .then((response) => {
+                expect([409]).to.include(response.status)
+                cy.log("Réponse :", JSON.stringify(response.body))
+            })
+        })
+    })
+    it("Devrait renvoyer une erreur si le produit est en rupture de stock", () => {
+        cy.loginBack().then((token) => {
+            cy.request({
+                method: "PUT",
+                url: `${Cypress.env("apiUrl")}/orders/add`,
+                failOnStatusCode: false,
+                headers: {
+                Authorization: `Bearer ${token}`,
+                },
+                body: {
+                product: 3,
                 quantity: 1,
                 },
             })

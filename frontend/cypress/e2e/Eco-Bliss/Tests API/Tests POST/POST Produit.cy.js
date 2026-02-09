@@ -1,11 +1,11 @@
 describe("Tests API - POST /orders/add", () => {
 
-    /**Dans ce test, on tente d'ajouter via la requête POST un produit dans le panier.
-     * Cependant, une requête PUT est utilisée à la place, ce qui fait que le test échoue systématiquement.
-     * L'échec du test prouve la présence d'une erreur.
+    /**Dans ce test, on tente d'ajouter un produit dans le panier.
+     * Dans le compte rendu des tests manuels de Marie, elle spécifie que les produits sont ajoutés dans le panier via une requête PUT.
+     * Ces deux tests, utilisant POST et PUT devraient permettre de confirmer cette affirmation.
      */
     
-  it("Devrait ajouter un produit disponible au panier", () => {
+  it("Ajout d'un produit au panier en utilisant POST", () => {
 
     cy.loginBack().then((token) => {
         cy.request({
@@ -16,13 +16,35 @@ describe("Tests API - POST /orders/add", () => {
                 Authorization: `Bearer ${token}`,
             },
             body: {
-                productId: 1,
+                product: 4,
                 quantity: 1,
             },
         })
         .then((response) => {
             expect(response.status).to.eq(200)
-            expect(response.body).to.have.property("message")
+            cy.log("Réponse :", JSON.stringify(response.body))
+        })
+    })
+    
+  })
+
+  it("Ajout d'un produit au panier en utilisant PUT", () => {
+
+    cy.loginBack().then((token) => {
+        cy.request({
+            method: "PUT",
+            url: `${Cypress.env("apiUrl")}/orders/add`,
+            failOnStatusCode: false,
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            body: {
+                product: 4,
+                quantity: 1,
+            },
+        })
+        .then((response) => {
+            expect(response.status).to.eq(200)
             cy.log("Réponse :", JSON.stringify(response.body))
         })
     })

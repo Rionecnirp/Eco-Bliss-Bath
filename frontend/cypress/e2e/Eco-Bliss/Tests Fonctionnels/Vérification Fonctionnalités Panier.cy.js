@@ -7,7 +7,7 @@ describe("Ajout au panier et vérification du stock", () => {
 
   beforeEach(() => {
     cy.loginFront()
-    cy.visit("http://localhost:4200/#/products")
+    cy.visit("/#/products")
   })
   afterEach(() => {
     cy.cleanCart().then(() => {
