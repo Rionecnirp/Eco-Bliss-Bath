@@ -6,36 +6,96 @@ describe("Tests API - Faille XSS", () => {
      * Puis, dans l'éventualité où l'avis est envoyé, on vérifie si le morceau de code n'est pas présent.
     */
 
+    beforeEach(() => {
+        cy.loginFront()
+    })
+
+    const marker = "10/02/2020"
+
+    it("Ne doit exécuter aucun JavaScript injecté dans les commentaires", () => {
+        const payload = `<script>window.__xss_executed = true;</script>`
+
+        cy.loginBack().then((token) => {
+            cy.request({
+                method: "POST",
+                url: `${Cypress.env("apiUrl")}/reviews`,
+                failOnStatusCode: false,
+                headers:
+                    { Authorization: `Bearer ${token}`
+                },
+                body: {
+                    rating: 5,
+                    title: `XSS execution test ${marker}`,
+                    comment: payload,
+                },
+            });
+        });
+
+        cy.visit("/#/reviews")
+        cy.get('[data-cy="review-title"]').contains(marker);
+        cy.window().then((win) => {
+            expect(win).not.to.have.property("__xss_executed");
+        });
+    })
+
     it("Ne doit pas accepter ni renvoyer de code HTML ou script brut", () => {
+
+        
+       const xssPayloads = [
+        "<script>alert('XSS')</script>",
+        "<img src=\"javascript:alert('XSS')\ onerror=alert('XSS') />",
+        "<svg onload=alert('XSS')>",
+        "<h1 style='color:red;'><u>test</u></h1>",
+       ]
 
         cy.loginBack().then((token) => {
 
-            const review = {
-                rating: 3,
-                title: "Test faille XSS",
-                comment: "<script>alert('XSS')</script>", 
-            }
+            cy.wrap(xssPayloads).each((payload) => {
+                cy.request({
+                    method: "POST",
+                    url: `${Cypress.env("apiUrl")}/reviews`,
+                    failOnStatusCode: false,
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: {
+                        rating: 5,
+                        title: `Test faille XSS V2 ${marker}`,
+                        comment: payload
+                    }
+                })
 
-            cy.request({
-                method: "POST",
-                url: "http://localhost:8081/reviews",
-                failOnStatusCode: false,
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-                body: review,
-            }).then((response) => {
-                cy.log("Réponse :", JSON.stringify(response.body))
+                .then((response) => {
+                    
+                    if ((response.status === 403)) {
+                        expect(403).to.include(response.status)
+                        return; 
+                    }
+                    expect(response.status).to.eq(200)
 
-                if ([400, 403].includes(response.status)) {
-                    expect([400, 403].toLocaleString.include(response.status))
-                }
+                    cy.visit("/#/reviews")
+                    cy.get('[data-cy="review-title"]')
+                    .filter(`:contains("${marker}")`)
+                    .each(($title) => {
+                        cy.wrap($title)
+                        .parents('.single-review')
+                        .find('[data-cy="review-comment"]')
+                        .then(($comment) => {
+                            const text = $comment.text()
+                            const html = $comment.html()
 
-                else if (response.status === 200) {
-                    expect(response.body.comment).to.not.include("<script>")
-                    expect(response.body.comment).to.not.include("</script>")
-                }
+                            expect(html).not.to.match(/<\s*script/i);
+                            expect(html).not.to.match(/\son\w+\s*=/i);
+                            expect(html).not.to.match(/javascript\s*:/i);
+                            expect(html).not.to.match(/<\s*svg/i);
+                            expect(html).not.to.match(/<\s*iframe/i)
+                            expect(text).not.to.eq(payload)
+                        })
+                    })
+                    
+                    
+                })
             })
         })
     })
