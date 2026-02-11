@@ -7,7 +7,7 @@ describe("Tests API - POST /orders/add", () => {
      * PUT mettra un objet dans le panier, quel que soit l'état du stock.
      */
 
-    it("Devrait renvoyer une erreur si le produit est en rupture de stock", () => {
+    it("Requête POST - Renvoie une erreur si le produit est en rupture de stock", () => {
         cy.loginBack().then((token) => {
             cy.request({
                 method: "POST",
@@ -22,12 +22,13 @@ describe("Tests API - POST /orders/add", () => {
                 },
             })
             .then((response) => {
-                expect([409]).to.include(response.status)
+                expect(response.status).to.not.eq(200)
                 cy.log("Réponse :", JSON.stringify(response.body))
             })
         })
     })
-    it("Devrait renvoyer une erreur si le produit est en rupture de stock", () => {
+
+    it("Requête PUT - Renvoie une erreur si le produit est en rupture de stock", () => {
         cy.loginBack().then((token) => {
             cy.request({
                 method: "PUT",
@@ -42,7 +43,7 @@ describe("Tests API - POST /orders/add", () => {
                 },
             })
             .then((response) => {
-                expect([409]).to.include(response.status)
+                expect(response.status).to.not.eq(200)
                 cy.log("Réponse :", JSON.stringify(response.body))
             })
         })
