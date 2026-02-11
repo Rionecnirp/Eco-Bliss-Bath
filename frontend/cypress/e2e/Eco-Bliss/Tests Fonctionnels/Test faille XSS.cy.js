@@ -1,16 +1,17 @@
 describe("Tests API - Faille XSS", () => {
 
     /**Dans ce test, on vérifie s'il est possible d'exploiter les avis pour faire de l'injection de script.
-     * Pour ce faire, on réutilise le code de l'envoi d'avis, mais on place un morceau de code dans la section commentaire.
+     * Pour ce faire, on réutilise le code de l'envoi de commentaire, mais on place un morceau de code dans la section commentaire.
+     * On place un marqueur dans le titre pour vérifier spécifiquement certains commentaires.
      * On essaie de regarder si l'envoi de l'avis est arrêté/interdit.
-     * Puis, dans l'éventualité où l'avis est envoyé, on vérifie si le morceau de code n'est pas présent.
+     * Puis, dans l'éventualité où l'avis est envoyé, on vérifie si le commentaire possède du code malveillant.
     */
 
     beforeEach(() => {
         cy.loginFront()
     })
 
-    const marker = "10/02/2020"
+    const marker = "10/05/2020"
 
     it("Ne doit exécuter aucun JavaScript injecté dans les commentaires", () => {
         const payload = `<script>window.__xss_executed = true;</script>`
@@ -32,9 +33,10 @@ describe("Tests API - Faille XSS", () => {
         });
 
         cy.visit("/#/reviews")
-        cy.get('[data-cy="review-title"]').contains(marker);
+        cy.get('[data-cy="review-title"]')
+        .contains(marker)
         cy.window().then((win) => {
-            expect(win).not.to.have.property("__xss_executed");
+            expect(win).not.to.have.property("__xss_executed")
         });
     })
 
@@ -85,10 +87,10 @@ describe("Tests API - Faille XSS", () => {
                             const text = $comment.text()
                             const html = $comment.html()
 
-                            expect(html).not.to.match(/<\s*script/i);
-                            expect(html).not.to.match(/\son\w+\s*=/i);
-                            expect(html).not.to.match(/javascript\s*:/i);
-                            expect(html).not.to.match(/<\s*svg/i);
+                            expect(html).not.to.match(/<\s*script/i)
+                            expect(html).not.to.match(/\son\w+\s*=/i)
+                            expect(html).not.to.match(/javascript\s*:/i)
+                            expect(html).not.to.match(/<\s*svg/i)
                             expect(html).not.to.match(/<\s*iframe/i)
                             expect(text).not.to.eq(payload)
                         })
